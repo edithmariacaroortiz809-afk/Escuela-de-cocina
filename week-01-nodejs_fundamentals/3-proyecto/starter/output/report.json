@@ -1,0 +1,90 @@
+{
+  "generatedAt": "2026-08-27T13:41:35.546Z",
+  "filter": "postres",
+  "summary": {
+    "total": 3,
+    "active": 3,
+    "inactive": 0,
+    "averagePrice": 12.466666666666667,
+    "mostExpensive": {
+      "id": 6,
+      "name": "Crème brûlée",
+      "category": "postres",
+      "price": 16,
+      "active": true,
+      "difficulty": "media",
+      "duration": 60,
+      "ingredients": [
+        "nata",
+        "yema",
+        "azúcar",
+        "vainilla"
+      ]
+    },
+    "cheapest": {
+      "id": 9,
+      "name": "Brownie de chocolate",
+      "category": "postres",
+      "price": 9.9,
+      "active": true,
+      "difficulty": "fácil",
+      "duration": 35,
+      "ingredients": [
+        "chocolate",
+        "harina",
+        "huevos",
+        "mantequilla"
+      ]
+    },
+    "categories": [
+      "postres"
+    ]
+  },
+  "items": [
+    {
+      "id": 5,
+      "name": "Tarta de manzana",
+      "category": "postres",
+      "price": 11.5,
+      "active": true,
+      "difficulty": "fácil",
+      "duration": 55,
+      "ingredients": [
+        "manzana",
+        "harina",
+        "mantequilla",
+        "canela"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Crème brûlée",
+      "category": "postres",
+      "price": 16,
+      "active": true,
+      "difficulty": "media",
+      "duration": 60,
+      "ingredients": [
+        "nata",
+        "yema",
+        "azúcar",
+        "vainilla"
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Brownie de chocolate",
+      "category": "postres",
+      "price": 9.9,
+      "active": true,
+      "difficulty": "fácil",
+      "duration": 35,
+      "ingredients": [
+        "chocolate",
+        "harina",
+        "huevos",
+        "mantequilla"
+      ]
+    }
+  ]
+}
