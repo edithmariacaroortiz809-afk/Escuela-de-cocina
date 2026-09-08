@@ -1,17 +1,21 @@
 import express from 'express';
-import { categoryRoutes } from './routes/category.routes.js';
-import { recipeRoutes } from './routes/recipe.routes.js';
-import { notFound } from './middlewares/notFound.js';
+import cookieParser from 'cookie-parser';
+import authRouter from './routes/auth.routes.js';
+import recipeRouter from './routes/recipe.routes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
-import { morganMiddleware } from './config/logger.js';
+import { notFound } from './middlewares/notFound.js';
 
 export const app = express();
 
 app.use(express.json());
-app.use(morganMiddleware);
+app.use(cookieParser());
 
-app.use('/api/v1/categories', categoryRoutes);
-app.use('/api/v1/recipes', recipeRoutes);
+// Rutas de autenticación
+app.use('/api/v1/auth', authRouter);
 
+// Recursos del dominio: Recetas (Escuela de Cocina)
+app.use('/api/v1/recipes', recipeRouter);
+
+// Middlewares de errores (siempre al final)
 app.use(notFound);
 app.use(errorHandler);

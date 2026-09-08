@@ -1,36 +1,30 @@
-import { Recipe } from '../models/recipe.model.js';
-import { AppError } from '../errors/AppError.js';
-import type { CreateRecipeInput, UpdateRecipeInput } from '../schemas/recipe.schema.js';
+import { RecipeModel, IRecipe } from '../models/recipe.model';
+import { CreateRecipeDto, UpdateRecipeDto } from '../schemas/recipe.schema';
 
-export const recipeRepository = {
-  async findAll(page: number, limit: number) {
-    const skip = (page - 1) * limit;
-    const [data, total] = await Promise.all([
-      Recipe.find().populate('category').sort({ createdAt: -1 }).skip(skip).limit(limit),
-      Recipe.countDocuments(),
-    ]);
-    return { data, total, page, totalPages: Math.ceil(total / limit) };
-  },
+// ============================================
+// REPOSITORIO: Receta
+// ============================================
 
-  async findById(id: string) {
-    const recipe = await Recipe.findById(id).populate('category');
-    if (!recipe) throw new AppError(404, 'Receta no encontrada');
-    return recipe;
-  },
+export async function findAll(): Promise<IRecipe[]> {
+  return RecipeModel.find().sort({ createdAt: -1 });
+}
 
-  async create(data: CreateRecipeInput) {
-    return Recipe.create(data);
-  },
+export async function findById(id: string): Promise<IRecipe | null> {
+  return RecipeModel.findById(id);
+}
 
-  async update(id: string, data: UpdateRecipeInput) {
-    const recipe = await Recipe.findByIdAndUpdate(id, data, { new: true, runValidators: true }).populate('category');
-    if (!recipe) throw new AppError(404, 'Receta no encontrada');
-    return recipe;
-  },
+export async function create(data: CreateRecipeDto & { createdBy: string }): Promise<IRecipe> {
+  return RecipeModel.create(data);
+}
 
-  async delete(id: string) {
-    const recipe = await Recipe.findByIdAndDelete(id);
-    if (!recipe) throw new AppError(404, 'Receta no encontrada');
-    return recipe;
-  },
-};
+export async function updateById(
+  id: string,
+  data: UpdateRecipeDto
+): Promise<IRecipe | null> {
+  return RecipeModel.findByIdAndUpdate(id, data, { new: true, runValidators: true });
+}
+
+export async function deleteById(id: string): Promise<boolean> {
+  const result = await RecipeModel.findByIdAndDelete(id);
+  return result !== null;
+}

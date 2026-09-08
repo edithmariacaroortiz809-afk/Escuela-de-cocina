@@ -1,10 +1,45 @@
-import { recipeRepository } from '../repositories/recipe.repository.js';
-import type { CreateRecipeInput, UpdateRecipeInput } from '../schemas/recipe.schema.js';
+import { IRecipe } from '../models/recipe.model';
+import * as recipeRepository from '../repositories/recipe.repository';
+import { CreateRecipeDto, UpdateRecipeDto } from '../schemas/recipe.schema';
+import { AppError } from '../errors/AppError';
 
-export const recipeService = {
-  getAll: (page: number, limit: number) => recipeRepository.findAll(page, limit),
-  getById: (id: string) => recipeRepository.findById(id),
-  create: (data: CreateRecipeInput) => recipeRepository.create(data),
-  update: (id: string, data: UpdateRecipeInput) => recipeRepository.update(id, data),
-  remove: (id: string) => recipeRepository.delete(id),
-};
+// ============================================
+// SERVICIO: Receta
+// ============================================
+
+export async function getAll(): Promise<IRecipe[]> {
+  return recipeRepository.findAll();
+}
+
+export async function getById(id: string): Promise<IRecipe> {
+  const recipe = await recipeRepository.findById(id);
+  if (!recipe) {
+    throw new AppError(404, 'Receta no encontrada');
+  }
+  return recipe;
+}
+
+export async function create(
+  dto: CreateRecipeDto,
+  userId: string
+): Promise<IRecipe> {
+  return recipeRepository.create({ ...dto, createdBy: userId });
+}
+
+export async function update(
+  id: string,
+  dto: UpdateRecipeDto
+): Promise<IRecipe> {
+  const recipe = await recipeRepository.updateById(id, dto);
+  if (!recipe) {
+    throw new AppError(404, 'Receta no encontrada');
+  }
+  return recipe;
+}
+
+export async function remove(id: string): Promise<void> {
+  const deleted = await recipeRepository.deleteById(id);
+  if (!deleted) {
+    throw new AppError(404, 'Receta no encontrada');
+  }
+}
