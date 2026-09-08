@@ -48,3 +48,12 @@ pnpm install
 pnpm seed
 pnpm dev
 ```
+
+## Evidencia
+
+Ver capturas en [`capturas-de-pantalla/`](./capturas-de-pantalla):
+
+- `01-get-populate.png` — `GET /api/v1/recipes` con la categoría populada
+- `02-post-201.png` — `POST /api/v1/recipes` exitoso
+- `03-post-400.png` — `POST /api/v1/recipes` con ID de categoría inválido
+- `04-post-409.png` — `POST /api/v1/categories` con nombre duplicado
