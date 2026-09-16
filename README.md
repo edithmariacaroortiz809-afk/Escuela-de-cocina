@@ -1,72 +1,69 @@
-# Semana 07 — API REST con Autenticación JWT
+# Semana 08 — API segura con RBAC y capas de seguridad
 
 ## Dominio: Escuela de Cocina
 
-API REST para gestionar recetas de cocina con autenticación completa usando JWT, Express 5, TypeScript, Mongoose y MongoDB.
+API REST para gestionar recetas con autenticación JWT y capas de seguridad usando Express, TypeScript, Mongoose y MongoDB.
 
-### Entidades
+## Seguridad aplicada
 
-- **Usuario** (`User`) — autenticación con email/password, roles
-- **Receta** (`Recipe`) — entidad principal protegida, requiere autenticación
+- Helmet agrega headers de seguridad, incluido `X-Content-Type-Options: nosniff`.
+- CORS usa whitelist y credenciales; no acepta `*`.
+- Rate limiting global: 100 solicitudes cada 15 minutos.
+- Rate limiting de autenticación: 5 solicitudes cada 15 minutos.
+- `express-mongo-sanitize` bloquea operadores NoSQL en entradas.
+- Errores de producción no exponen stack traces.
 
-### Endpoints
+## Roles y permisos
 
-**Autenticación** (`/api/v1/auth`)
-- `POST /api/v1/auth/register` — registrar usuario
-- `POST /api/v1/auth/login` — iniciar sesión (devuelve cookies HttpOnly)
-- `GET /api/v1/auth/me` — perfil del usuario autenticado (protegida)
-- `POST /api/v1/auth/refresh` — renovar access token (rotación)
-- `POST /api/v1/auth/logout` — cerrar sesión
+| Operación | Invitado | Usuario autenticado | Admin |
+|---|---:|---:|---:|
+| Listar recetas | Sí | Sí | Sí |
+| Ver receta | Sí | Sí | Sí |
+| Crear receta | No | Sí | Sí |
+| Actualizar receta propia | No | Sí | Sí |
+| Actualizar receta ajena | No | No | Sí |
+| Eliminar receta | No | No | Sí |
 
-**Recetas** (`/api/v1/recipes`) — Todas protegidas con JWT
-- `GET /api/v1/recipes` — listar todas
-- `GET /api/v1/recipes/:id` — obtener por ID
-- `POST /api/v1/recipes` — crear (requiere autenticación)
-- `PATCH /api/v1/recipes/:id` — actualizar parcialmente
-- `DELETE /api/v1/recipes/:id` — eliminar
+## Endpoints
 
-### Manejo de errores
+### Salud y autenticación
 
-- `400` — Datos inválidos (Zod) o ID inválido
-- `401` — No autenticado (sin token o token inválido)
-- `404` — Recurso no encontrado
-- `409` — Email o nombre de receta duplicado
+- `GET /api/v1/health` — público.
+- `POST /api/v1/auth/register` — registro, limitado por rate limiter.
+- `POST /api/v1/auth/login` — login con cookies HttpOnly, limitado por rate limiter.
+- `GET /api/v1/auth/me` — usuario autenticado.
+- `POST /api/v1/auth/refresh` — renovar access token.
+- `POST /api/v1/auth/logout` — cerrar sesión.
 
-### Seguridad implementada
+### Recetas
 
-- Contraseñas hasheadas con bcrypt (salt rounds 10)
-- Access tokens (15 min) y refresh tokens (7 días)
-- Cookies HttpOnly para tokens (nunca en localStorage)
-- Rotación de refresh tokens
-- Rutas protegidas con middleware de autenticación
+- `GET /api/v1/recipes` — público.
+- `GET /api/v1/recipes/:id` — público.
+- `POST /api/v1/recipes` — autenticado.
+- `PATCH /api/v1/recipes/:id` — dueño autenticado o admin.
+- `DELETE /api/v1/recipes/:id` — solo admin.
 
-## Cómo ejecutar
+## Modelo de receta
+
+- `name`: nombre único de la receta.
+- `description`: descripción opcional.
+- `price`: precio no negativo.
+- `difficulty`: `fácil`, `media` o `difícil`.
+- `duration`: duración en minutos.
+- `createdBy`: usuario propietario.
+- `active`: disponibilidad de la receta.
+
+## Ejecución
 
 ```bash
 docker compose up -d
-cp .env.example .env
-# Editar .env con tus secrets JWT
+copy .env.example .env
 pnpm install
 pnpm dev
 ```
 
-## Evidencia
-
-Ver capturas en [`capturas-de-pantalla/`](./capturas-de-pantalla):
-
-- `01-register.png` — Registro exitoso
-- `02-login.png` — Login con cookies HttpOnly
-- `03-get-recipes-auth.png` — Listar recetas autenticado
-- `04-create-recipe.png` — Crear receta (201)
-- `05-401-sin-auth.png` — Acceso sin token (401)
-- `06-refresh.png` — Refresh token exitoso
-- `07-logout.png` — Logout y cookies limpiadas
+Configura en `.env` dos secretos JWT diferentes: `JWT_ACCESS_SECRET` y `JWT_REFRESH_SECRET`.
 
 ## Evidencia
 
-Ver capturas en [`capturas-de-pantalla/`](./capturas-de-pantalla):
-
-- `01-get-populate.png` — `GET /api/v1/recipes` con la categoría populada
-- `02-post-201.png` — `POST /api/v1/recipes` exitoso
-- `03-post-400.png` — `POST /api/v1/recipes` con ID de categoría inválido
-- `04-post-409.png` — `POST /api/v1/categories` con nombre duplicado
+Las capturas están en [`capturas-de-pantalla/`](./capturas-de-pantalla).

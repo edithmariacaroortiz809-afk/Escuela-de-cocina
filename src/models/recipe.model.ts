@@ -1,8 +1,4 @@
-import mongoose, { Document, Schema } from 'mongoose';
-
-// ============================================
-// MODELO: Receta (Escuela de Cocina)
-// ============================================
+import { Schema, model, Document } from 'mongoose';
 
 export interface IRecipe extends Document {
   name: string;
@@ -10,45 +6,23 @@ export interface IRecipe extends Document {
   price: number;
   difficulty: 'fácil' | 'media' | 'difícil';
   duration: number;
-  createdBy: mongoose.Types.ObjectId;
+  active: boolean;
+  createdBy: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
 const recipeSchema = new Schema<IRecipe>(
   {
-    name: {
-      type: String,
-      required: [true, 'El nombre es requerido'],
-      trim: true,
-      unique: true,
-    },
-    description: {
-      type: String,
-      trim: true,
-    },
-    price: {
-      type: Number,
-      required: [true, 'El precio es requerido'],
-      min: [0, 'El precio no puede ser negativo'],
-    },
-    difficulty: {
-      type: String,
-      enum: ['fácil', 'media', 'difícil'],
-      required: [true, 'La dificultad es requerida'],
-    },
-    duration: {
-      type: Number,
-      required: [true, 'La duración es requerida'],
-      min: [1, 'La duración mínima es 1 minuto'],
-    },
-    createdBy: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-    },
+    name: { type: String, required: true, unique: true, trim: true },
+    description: { type: String, trim: true },
+    price: { type: Number, required: true, min: 0 },
+    difficulty: { type: String, enum: ['fácil', 'media', 'difícil'], required: true },
+    duration: { type: Number, required: true, min: 1 },
+    active: { type: Boolean, default: true },
+    createdBy: { type: String, required: true },
   },
   { timestamps: true }
 );
 
-export const RecipeModel = mongoose.model<IRecipe>('Recipe', recipeSchema);
+export const Recipe = model<IRecipe>('Recipe', recipeSchema);

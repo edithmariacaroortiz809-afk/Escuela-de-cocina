@@ -1,18 +1,17 @@
 import { z } from 'zod';
 
-// ============================================
-// SCHEMA: Receta (Escuela de Cocina)
-// ============================================
-
-export const createRecipeSchema = z.object({
-  name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres').max(100),
-  description: z.string().max(500).optional(),
-  price: z.number().min(0, 'El precio no puede ser negativo'),
+const recipeFields = {
+  name: z.string().min(2).max(200).regex(/^[^<>]*$/, 'El nombre no puede contener HTML'),
+  description: z.string().max(1000).regex(/^[^<>]*$/, 'La descripción no puede contener HTML').optional(),
+  price: z.number().min(0),
   difficulty: z.enum(['fácil', 'media', 'difícil']),
-  duration: z.number().min(1, 'La duración mínima es 1 minuto'),
+  duration: z.number().int().min(1),
+};
+
+export const createRecipeSchema = z.object({ body: z.object(recipeFields) });
+export const updateRecipeSchema = z.object({
+  body: z.object({ ...recipeFields, active: z.boolean().optional() }).partial(),
 });
 
-export const updateRecipeSchema = createRecipeSchema.partial();
-
-export type CreateRecipeDto = z.infer<typeof createRecipeSchema>;
-export type UpdateRecipeDto = z.infer<typeof updateRecipeSchema>;
+export type CreateRecipeDto = z.infer<typeof createRecipeSchema>['body'];
+export type UpdateRecipeDto = z.infer<typeof updateRecipeSchema>['body'];

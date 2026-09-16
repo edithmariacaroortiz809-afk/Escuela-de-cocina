@@ -1,16 +1,11 @@
 services:
   mongo:
     image: mongo:7
-    container_name: escuela-cocina-mongo
-    restart: unless-stopped
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: cocina
-      MONGO_INITDB_ROOT_PASSWORD: cocina
-      MONGO_INITDB_DATABASE: escuela_cocina
+    container_name: proyecto-semana-08-mongo
     ports:
-      - "27018:27017"
+      - "27017:27017"
     volumes:
-      - mongo_data:/data/db
+      - proyecto-mongo-data:/data/db
 
 volumes:
-  mongo_data:
+  proyecto-mongo-data:
