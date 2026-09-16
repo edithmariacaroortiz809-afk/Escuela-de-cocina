@@ -3,20 +3,20 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import cors from 'cors';
-import mongoSanitize from 'express-mongo-sanitize';
 import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
 import recipeRoutes from './routes/recipe.routes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { notFound } from './middlewares/notFound.js';
 import { globalLimiter, corsOptions } from './config/security.js';
+import { sanitizeRequest } from './middlewares/sanitizeRequest.js';
 
 const app = express();
 
 // Security layers — order matters
 app.use(helmet());
 app.use(globalLimiter);
-app.options('*', cors(corsOptions)); // preflight
+app.options('/{*splat}', cors(corsOptions)); // preflight
 app.use(cors(corsOptions));
 
 // Body parsing
@@ -25,7 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Sanitize inputs AFTER parsing, BEFORE routes
-app.use(mongoSanitize());
+app.use(sanitizeRequest);
 
 // Health check
 app.get('/api/v1/health', (_req, res) => {
