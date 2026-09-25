@@ -1,4 +1,6 @@
-# Semana 08 — API segura con RBAC y capas de seguridad
+# Semana 09 — Pruebas de API REST
+
+Construido sobre la API de Semana 08 (RBAC y capas de seguridad).
 
 ## Dominio: Escuela de Cocina
 
@@ -63,6 +65,30 @@ pnpm dev
 ```
 
 Configura en `.env` dos secretos JWT diferentes: `JWT_ACCESS_SECRET` y `JWT_REFRESH_SECRET`.
+
+## Pruebas (Semana 09)
+
+Suite de pruebas con Jest, Supertest y MongoDB Memory Server sobre el dominio de recetas.
+
+```bash
+pnpm test              # ejecutar todos los tests
+pnpm test:watch        # modo watch
+pnpm test:coverage     # reporte de cobertura → coverage/index.html
+```
+
+Las variables de entorno para pruebas están en `.env.test` (secretos JWT ficticios; no se usa una base de datos real, `mongodb-memory-server` levanta una en memoria).
+
+### Archivos de prueba
+
+- `src/__tests__/recipe.service.test.ts` — unitarias del servicio de recetas con `jest.mock()` sobre el modelo Mongoose: listar (con y sin filtro), buscar por ID (+404), crear (+409 por nombre duplicado), actualizar (+404, +403 si no es dueño ni admin) y eliminar (+404).
+- `src/__tests__/auth.service.test.ts` — unitarias del servicio de autenticación con mocks de `bcrypt`, el repositorio de usuarios y las utilidades JWT: registro (+409), login (+401), refresh de tokens (+401), logout y `getMe` (+404).
+- `src/__tests__/recipe.routes.test.ts` — integración de `/api/v1/recipes` con Supertest + MongoDB Memory Server: 200/201/401/403/404/422 según el caso.
+- `src/__tests__/auth.routes.test.ts` — integración de `/api/v1/auth`, `/api/v1/users/dashboard` y `/api/v1/health`.
+
+### Resultado
+
+- 45 tests, 4 suites, todos pasando.
+- Cobertura: 92.8% statements · 73.3% branches · 97.5% functions · 95.6% lines (umbral exigido: 80/70/80/80 en `jest.config.ts`).
 
 ## Evidencia
 

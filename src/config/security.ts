@@ -1,12 +1,15 @@
 import rateLimit from 'express-rate-limit';
 import cors, { CorsOptions } from 'cors';
 
+const isTestEnv = process.env.NODE_ENV === 'test';
+
 // Global limiter — all endpoints: 100 req / 15 min
 export const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
+  skip: () => isTestEnv,
   message: { error: 'Too many requests, please try again later' },
 });
 
@@ -16,6 +19,7 @@ export const authLimiter = rateLimit({
   max: 5,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
+  skip: () => isTestEnv,
   message: { error: 'Too many login attempts, please try again later' },
 });
 
